@@ -19,7 +19,8 @@ def msg_builder(button_id):
 
     msg_to_send = sync_byte + hex_cam_id + key_id_byte + button_id + "00" + "00" + msg_checksum
     print(msg_to_send)
-    serial_functions.send_serial_msg(interface_id, msg_to_send)
+    msg_sender = serial_functions.SerialConnection()
+    msg_sender.send_serial_msg(interface_id, msg_to_send)
 
 
 def calc_checksum(cam_id, button_id):

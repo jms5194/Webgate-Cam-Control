@@ -224,18 +224,21 @@ class WebgateCamControlGUI(wx.Frame):
             chosen_port = self.serial_choices[event.Selection]
             config_functions.update_last_interface_in_config(chosen_port,
                                                              config_functions.where_to_put_user_data())
+            config_functions.set_vars_from_pref(config_functions.where_to_put_user_data())
             # Interface config has changed so reopen the serial port
             pub.sendMessage('chosenPort', port_to_open=chosen_port)
         elif incoming_choice_id == self.baud_sel_wxid.GetId():
             baud_rate = self.baud_choices[event.Selection]
             config_functions.update_last_baud_in_config(baud_rate,
                                                         config_functions.where_to_put_user_data())
+            config_functions.set_vars_from_pref(config_functions.where_to_put_user_data())
             # Interface config has changed so reopen the serial port
             pub.sendMessage('chosenBaud', baud_to_open=baud_rate)
         elif incoming_choice_id == self.camid_sel_wxid.GetId():
             cam_id = self.camid_choices[event.Selection]
             config_functions.update_last_cam_in_config(cam_id,
                                                        config_functions.where_to_put_user_data())
+            config_functions.set_vars_from_pref(config_functions.where_to_put_user_data())
 
 
 class EditableListCtrl(wx.ListCtrl, listmix.TextEditMixin, listmix.ListCtrlAutoWidthMixin):
