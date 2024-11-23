@@ -2,6 +2,8 @@ import appdirs
 import os.path
 import configparser
 from configupdater import ConfigUpdater
+from pubsub import pub
+import constants
 import settings
 
 
@@ -43,6 +45,7 @@ def build_initial_ini(ini_prefs_path):
     config["main"]["window_size_y"] = "299"
     config["main"]["window_pos_x"] = "400"
     config["main"]["window_pos_y"] = "222"
+    config["main"]["cam_names"] = ",".join(constants.DEFAULT_CAM_LABELS)
 
     with open(ini_prefs_path, "w") as configfile:
         config.write(configfile)
@@ -58,6 +61,7 @@ def set_vars_from_pref(config_file_loc):
     settings.last_interface = config["main"]["last_interface"]
     settings.last_baud = config["main"]["last_baud"]
     settings.last_camID = config["main"]["last_cam"]
+    settings.camID_names = config["main"]["cam_names"].split(",")
 
 
 def update_pos_in_config(win_pos_tuple, ini_prefs_path):
@@ -83,6 +87,7 @@ def update_size_in_config(win_size_tuple, ini_prefs_path):
         print(e)
     updater.update_file()
 
+
 def update_last_interface_in_config(last_interface, ini_prefs_path):
     updater = ConfigUpdater()
     updater.read(ini_prefs_path)
@@ -91,6 +96,7 @@ def update_last_interface_in_config(last_interface, ini_prefs_path):
     except Exception as e:
         print(e)
     updater.update_file()
+
 
 def update_last_baud_in_config(last_baud, ini_prefs_path):
     updater = ConfigUpdater()
@@ -101,6 +107,7 @@ def update_last_baud_in_config(last_baud, ini_prefs_path):
         print(e)
     updater.update_file()
 
+
 def update_last_cam_in_config(last_cam, ini_prefs_path):
     updater = ConfigUpdater()
     updater.read(ini_prefs_path)
@@ -109,3 +116,18 @@ def update_last_cam_in_config(last_cam, ini_prefs_path):
     except Exception as e:
         print(e)
     updater.update_file()
+
+
+def update_cam_names_in_config(cam_names, ini_prefs_path):
+    updater = ConfigUpdater()
+    updater.read(ini_prefs_path)
+    try:
+        updater["main"]["cam_names"] = ",".join(cam_names)
+    except Exception as e:
+        print(e)
+    updater.update_file()
+
+
+def cam_labels():
+    cam_list = settings.camID_names
+    pub.sendMessage("AvailableCams", choices=cam_list)

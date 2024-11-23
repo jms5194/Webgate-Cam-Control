@@ -1,18 +1,10 @@
 import serial_functions
-import os
-from pubsub import pub
 import settings
 
 
-def msg_builder(button_ID):
-    Sync_Byte = "ff"
-    key_ID_Byte = "00"
-    # For reference below:
-    key_right_Byte = "02"
-    key_left_Byte = "04"
-    key_up_Byte = "08"
-    key_down_Byte = "10"
-    key_enter_Byte = "1e"
+def msg_builder(button_id):
+    sync_byte = "ff"
+    key_id_byte = "00"
 
     interface_id = settings.last_interface
     print(interface_id)
@@ -23,36 +15,21 @@ def msg_builder(button_ID):
     except ValueError as e:
         print("Invalid Camera Selected")
 
-    msg_checksum = Calc_Checksum(hex_cam_id, button_ID)
+    msg_checksum = calc_checksum(hex_cam_id, button_id)
 
-    msg_toSend = Sync_Byte + hex_cam_id + key_ID_Byte + button_ID + "00" + "00" + msg_checksum
-    print(msg_toSend)
-    serial_functions.Send_Serial_Msg(interface_id, msg_toSend)
+    msg_to_send = sync_byte + hex_cam_id + key_id_byte + button_id + "00" + "00" + msg_checksum
+    print(msg_to_send)
+    serial_functions.send_serial_msg(interface_id, msg_to_send)
 
 
-def Calc_Checksum(Cam_ID, button_ID):
+def calc_checksum(cam_id, button_id):
 
-    byte_2_int = int(Cam_ID, 16)
+    byte_2_int = int(cam_id, 16)
     byte_3_int = 0
-    byte_4_int = int(button_ID, 16)
+    byte_4_int = int(button_id, 16)
     byte_5_int = 0
     byte_6_int = 0
 
     checksum_sum = byte_2_int + byte_3_int + byte_4_int + byte_5_int + byte_6_int
     checksum_hex = "%0.2x" % checksum_sum
     return checksum_hex
-
-def cam_labels():
-    # Pulls camera labels from a pre-specified file:
-    try:
-        labelpos = os.path.expanduser("~/documents/camlabels.txt")
-        camlabels = open(labelpos, "r")
-        cam_list = camlabels.readlines()
-        camlabels.close()
-    except:
-        # If no file is available, then just make a list of 64 possible IDs
-        cams = []
-        for i in range(1, 65):
-            cams.append(str(i) + ":")
-        cam_list = cams
-    pub.sendMessage("AvailableCams", choices=cam_list)

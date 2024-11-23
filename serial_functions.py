@@ -4,10 +4,8 @@ from pubsub import pub
 
 import settings
 
-
-#Need to repair all the class based self linkages in here:
-
 ser_port = None
+
 
 def serial_ports():
     # Lists serial port names
@@ -17,11 +15,12 @@ def serial_ports():
         available_ports.append(element.device)
     pub.sendMessage("AvailablePorts", choices=available_ports)
 
-def Send_Serial_Msg(interface, msg):
+
+def send_serial_msg(interface, msg):
     # Opens serial port connection
     global ser_port
     if settings.last_interface == interface:
-        if ser_port != None:
+        if ser_port is not None:
             if ser_port.isOpen():
                 ser_port.write(bytearray.fromhex(msg))
             else:
@@ -32,18 +31,21 @@ def Send_Serial_Msg(interface, msg):
         settings.last_interface = interface
         ser_port.close_serial()
         ser_port.open_serial(interface)
-        if ser_port != None:
+        if ser_port is not None:
             if ser_port.isOpen():
                 ser_port.write(bytearray.fromhex(msg))
             else:
                 print("Serial port is not open")
 
+
 def open_serial(interface):
+    global ser_port
     try:
         ser_port = serial.Serial(interface, int(settings.last_baud))
     except:
         print("Serial Connection Failed")
 
+
 def close_serial():
-    if ser_port != None:
+    if ser_port is not None:
         ser_port.close()
