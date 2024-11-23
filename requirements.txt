@@ -1,2 +1,12 @@
-pyserial~=3.5
-PySimpleGUI~=4.56.0
+altgraph==0.17.4
+appdirs==1.4.4
+ConfigUpdater==3.2
+macholib==1.16.3
+packaging==24.2
+pyinstaller==6.11.1
+pyinstaller-hooks-contrib==2024.10
+Pypubsub==4.0.3
+pyserial==3.5
+setuptools==75.6.0
+six==1.16.0
+wxPython==4.2.2

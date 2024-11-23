@@ -38,9 +38,6 @@ def Send_Serial_Msg(interface, msg):
             else:
                 print("Serial port is not open")
 
-def update_baud()
-
-
 def open_serial(interface):
     try:
         ser_port = serial.Serial(interface, int(settings.last_baud))

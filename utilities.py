@@ -1,6 +1,6 @@
 import serial_functions
 import os
-
+from pubsub import pub
 import settings
 
 
@@ -47,14 +47,12 @@ def cam_labels():
     try:
         labelpos = os.path.expanduser("~/documents/camlabels.txt")
         camlabels = open(labelpos, "r")
-        self.CamList = camlabels.readlines()
+        cam_list = camlabels.readlines()
         camlabels.close()
-        serial_functions.serial_ports()
-
     except:
         # If no file is available, then just make a list of 64 possible IDs
         cams = []
         for i in range(1, 65):
             cams.append(str(i) + ":")
-        self.CamList = cams
-        serial_functions.serial_ports()
+        cam_list = cams
+    pub.sendMessage("AvailableCams", choices=cam_list)

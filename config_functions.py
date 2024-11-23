@@ -38,6 +38,7 @@ def build_initial_ini(ini_prefs_path):
     config["main"] = {}
     config["main"]["last_interface"] = ""
     config["main"]["last_baud"] = "0"
+    config["main"]["last_cam"] = "1:"
     config["main"]["window_size_x"] = "349"
     config["main"]["window_size_y"] = "299"
     config["main"]["window_pos_x"] = "400"
@@ -56,6 +57,7 @@ def set_vars_from_pref(config_file_loc):
     settings.window_loc = (int(config["main"]["window_pos_x"]), int(config["main"]["window_pos_y"]))
     settings.last_interface = config["main"]["last_interface"]
     settings.last_baud = config["main"]["last_baud"]
+    settings.last_camID = config["main"]["last_cam"]
 
 
 def update_pos_in_config(win_pos_tuple, ini_prefs_path):
@@ -95,6 +97,15 @@ def update_last_baud_in_config(last_baud, ini_prefs_path):
     updater.read(ini_prefs_path)
     try:
         updater["main"]["last_baud"] = str(last_baud)
+    except Exception as e:
+        print(e)
+    updater.update_file()
+
+def update_last_cam_in_config(last_cam, ini_prefs_path):
+    updater = ConfigUpdater()
+    updater.read(ini_prefs_path)
+    try:
+        updater["main"]["last_cam"] = str(last_cam)
     except Exception as e:
         print(e)
     updater.update_file()
