@@ -126,44 +126,44 @@ jobs:
       - name: Zip Application for Notarization
         if: (matrix.os == 'macos-x86' || matrix.os == 'macos-arm64')
         run: |
-          ditto -c -k --keepParent "dist/Webgate Cam Control.app" "Webgate Cam Control.zip"
+          ditto -c -k --keepParent "dist/Webgate Camera Control.app" "Webgate Camera Control.zip"
       # Send the application zip to Apple for Notarization and stapling
       - name: Notarize and Staple
         if: (matrix.os == 'macos-x86' || matrix.os == 'macos-arm64')
         run: |
-          xcrun notarytool submit "Webgate Cam Control.zip" --apple-id \
+          xcrun notarytool submit "Webgate Camera Control.zip" --apple-id \
             "${{ secrets.APPLE_DEVELOPER_ID_USER }}" --password \
             "${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}" --team-id \
             "${{ secrets.APPLE_DEVELOPER_ID_TEAM }}" --wait --verbose
-          chmod 755 "dist/Webgate Cam Control.app"
-          xcrun stapler staple "dist/Webgate Cam Control.app"
+          chmod 755 "dist/Webgate Camera Control.app"
+          xcrun stapler staple "dist/Webgate Camera Control.app"
 
       - name: Verify Notarization
         if: (matrix.os == 'macos-x86' || matrix.os == 'macos-arm64')
         run: |
-          spctl -a -v "dist/Webgate Cam Control.app"
-          rm "Webgate Cam Control.zip"
+          spctl -a -v "dist/Webgate Camera Control.app"
+          rm "Webgate Camera Control.zip"
       # Build an installer DMG for MacOS
       - name: Create dmg MacOS
         if: matrix.os == 'macos-x86' || matrix.os == 'macos-arm64'
         run: |
-          chmod a+x "dist/Webgate Cam Control.app"
+          chmod a+x "dist/Webgate Camera Control.app"
           brew update
           brew upgrade
           brew install create-dmg
           create-dmg \
-          --volname "Webgate Cam Control Installer" \
+          --volname "Webgate Camera Control Installer" \
           --app-drop-link 600 185 \
           --window-pos 200 120 \
           --window-size 800 400 \
-          --hide-extension "Webgate Cam Control.app" \
-          "Webgate Cam Control Installer"-${{ matrix.target }}.dmg \
-          "dist/Webgate Cam Control.app"
+          --hide-extension "Webgate Camera Control.app" \
+          "Webgate Camera Control Installer"-${{ matrix.target }}.dmg \
+          "dist/Webgate Camera Control.app"
       # Zip the windows applications
       - name: Create zip on Windows
         if: matrix.os == 'windows-latest'
         run: |
-          Compress-Archive -Path "dist/Webgate Cam Control.exe" -DestinationPath "./Webgate Cam Control-win.zip"
+          Compress-Archive -Path "dist/Webgate Camera Control.exe" -DestinationPath "./Webgate Camera Control-win.zip"
         shell: pwsh
       # Add the built binaries to the release
       - name: Release
@@ -171,6 +171,6 @@ jobs:
         with:
           tag_name: ${{ needs.create_release.outputs.tag-name }}
           files: |
-            Webgate\ Cam\ Control\ Installer-macos-arm64.dmg
-            Webgate\ Cam\ Control\ Installer-macos-x86.dmg
-            Webgate\ Cam\ Control-win.zip
+            Webgate\ Camera\ Control\ Installer-macos-arm64.dmg
+            Webgate\ Camera\ Control\ Installer-macos-x86.dmg
+            Webgate\ Camera\ Control-win.zip
