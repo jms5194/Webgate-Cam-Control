@@ -1,8 +1,8 @@
-"""C1080PBM GUI Control"""
+"""Webgate GUI Control"""
 
 __author__ = "Justin Stasiw"
-__version__ = "$Revision 0.1b$"
-__date__ = "$Date: 2019/07/12"
+__version__ = "$Revision 1.0$"
+__date__ = "$Date: 2024/11/25"
 
 import sys
 
@@ -51,6 +51,10 @@ class WebgateCamControlGUI(wx.Frame):
         panel_sizer.Add(self.camid_selector, 1, wx.ALL | wx.EXPAND, 10)
 
         # Camera menu nav buttons
+        panel_sizer.AddSpacer(5)
+        menu_controls_text = wx.StaticText(panel, label="Menu Controls", style=wx.ALIGN_CENTER)
+        panel_sizer.Add(menu_controls_text, 0, wx.ALL | wx.EXPAND, 0)
+        panel_sizer.AddSpacer(5)
         button_grid = wx.GridSizer(3, 3, 10, 10)
         nav_up_button = wx.Button(panel, label="Up")
         nav_left_button = wx.Button(panel, label="Left")
@@ -69,6 +73,35 @@ class WebgateCamControlGUI(wx.Frame):
         button_grid.Add(empty_cell, flag=wx.ALIGN_CENTER_HORIZONTAL)
 
         panel_sizer.Add(button_grid, 0, wx.ALL | wx.EXPAND, 5)
+
+        # Direct Access buttons
+        panel_sizer.AddSpacer(10)
+        direct_controls_text = wx.StaticText(panel, label="Direct Controls", style=wx.ALIGN_CENTER)
+        panel_sizer.Add(direct_controls_text, 0, wx.ALL | wx.EXPAND, 0)
+        panel_sizer.AddSpacer(5)
+        button_grid2 = wx.GridSizer(1, 3, 10, 10)
+        b_w_button = wx.Button(panel, label="B/W")
+        auto_button = wx.Button(panel, label="Auto")
+        color_button = wx.Button(panel, label="Color")
+        button_grid2.Add(b_w_button, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        button_grid2.Add(auto_button, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        button_grid2.Add(color_button, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        panel_sizer.Add(button_grid2, 0, wx.ALL | wx.EXPAND, 5)
+        button_grid3 = wx.GridSizer(1, 2, 10, 10)
+        brightness_down_button = wx.Button(panel, label="Brightness -")
+        brightnes_up_button = wx.Button(panel, label="Brightness +")
+        button_grid3.Add(brightness_down_button, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        button_grid3.Add(brightnes_up_button, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        panel_sizer.Add(button_grid3, 0, wx.ALL | wx.EXPAND, 5)
+        button_grid4 = wx.GridSizer(1, 3, 10, 10)
+        agc_down_button = wx.Button(panel, label="AGC -")
+        agc_mid_button = wx.Button(panel, label="AGC Middle")
+        agc_up_button = wx.Button(panel, label="AGC +")
+        button_grid4.Add(agc_down_button, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        button_grid4.Add(agc_mid_button, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        button_grid4.Add(agc_up_button, flag=wx.ALIGN_CENTER_HORIZONTAL)
+        panel_sizer.Add(button_grid4, 0, wx.ALL | wx.EXPAND, 5)
+
         panel.SetSizer(panel_sizer)
 
         # Accelerator entries to allow for Menu access from keystrokes
@@ -189,33 +222,115 @@ class WebgateCamControlGUI(wx.Frame):
             self.press_down()
         elif btn == "Enter":
             self.press_enter()
+        elif btn == "B/W":
+            self.press_bw()
+        elif btn == "Auto":
+            self.press_auto()
+        elif btn == "Color":
+            self.press_color()
+        elif btn == "Brightness -":
+            self.press_brightness_down()
+        elif btn == "Brightness +":
+            self.press_brightness_up()
+        elif btn == "AGC -":
+            self.press_agc_down()
+        elif btn == "AGC Middle":
+            self.press_agc_mid()
+        elif btn == "AGC +":
+            self.press_agc_up()
         else:
             print("Msg not recognized")
 
     @staticmethod
     def press_left(*args):
+        key_id = "00"
         button_id = "04"
-        utilities.msg_builder(button_id)
+        preset_id = "00"
+        utilities.msg_builder(key_id, button_id, preset_id)
 
     @staticmethod
     def press_right(*args):
+        key_id = "00"
         button_id = "02"
-        utilities.msg_builder(button_id)
+        preset_id = "00"
+        utilities.msg_builder(key_id, button_id, preset_id)
 
     @staticmethod
     def press_up(*args):
+        key_id = "00"
         button_id = "08"
-        utilities.msg_builder(button_id)
+        preset_id = "00"
+        utilities.msg_builder(key_id, button_id, preset_id)
 
     @staticmethod
     def press_down(*args):
+        key_id = "00"
         button_id = "10"
-        utilities.msg_builder(button_id)
+        preset_id = "00"
+        utilities.msg_builder(key_id, button_id, preset_id)
 
     @staticmethod
     def press_enter(*args):
+        key_id = "00"
         button_id = "1e"
-        utilities.msg_builder(button_id)
+        preset_id = "00"
+        utilities.msg_builder(key_id, button_id, preset_id)
+
+    @staticmethod
+    def press_bw(*args):
+        key_id = "00"
+        button_id = "07"
+        preset_id = "52"
+        utilities.msg_builder(key_id, button_id, preset_id)
+
+    @staticmethod
+    def press_auto(*args):
+        key_id = "00"
+        button_id = "07"
+        preset_id = "50"
+        utilities.msg_builder(key_id, button_id, preset_id)
+
+    @staticmethod
+    def press_color(*args):
+        key_id = "00"
+        button_id = "07"
+        preset_id = "51"
+        utilities.msg_builder(key_id, button_id, preset_id)
+
+    @staticmethod
+    def press_brightness_down(*args):
+        key_id = "00"
+        button_id = "07"
+        preset_id = "53"
+        utilities.msg_builder(key_id, button_id, preset_id)
+
+    @staticmethod
+    def press_brightness_up(*args):
+        key_id = "00"
+        button_id = "07"
+        preset_id = "54"
+        utilities.msg_builder(key_id, button_id, preset_id)
+
+    @staticmethod
+    def press_agc_down(*args):
+        key_id = "00"
+        button_id = "07"
+        preset_id = "65"
+        utilities.msg_builder(key_id, button_id, preset_id)
+
+    @staticmethod
+    def press_agc_up(*args):
+        key_id = "00"
+        button_id = "07"
+        preset_id = "66"
+        utilities.msg_builder(key_id, button_id, preset_id)
+
+    @staticmethod
+    def press_agc_mid(*args):
+        key_id = "00"
+        button_id = "07"
+        preset_id = "64"
+        utilities.msg_builder(key_id, button_id, preset_id)
 
     def update_interfaces(self, event):
         # When any dropdown is changed, this def is called to deal with the change
@@ -325,4 +440,3 @@ if __name__ == "__main__":
     app = wx.App()
     frame = WebgateCamControlGUI()
     app.MainLoop()
-

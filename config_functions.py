@@ -41,8 +41,8 @@ def build_initial_ini(ini_prefs_path):
     config["main"]["last_interface"] = ""
     config["main"]["last_baud"] = "0"
     config["main"]["last_cam"] = "1:"
-    config["main"]["window_size_x"] = "349"
-    config["main"]["window_size_y"] = "299"
+    config["main"]["window_size_x"] = "403"
+    config["main"]["window_size_y"] = "472"
     config["main"]["window_pos_x"] = "400"
     config["main"]["window_pos_y"] = "222"
     config["main"]["cam_names"] = ",".join(constants.DEFAULT_CAM_LABELS)
