@@ -22,7 +22,6 @@ class SerialConnection:
         # Send a serial message
 
         if settings.last_interface == interface:
-            print("=")
             if self.ser_port is not None:
                 if self.ser_port.isOpen():
                     self.ser_port.write(bytearray.fromhex(msg))

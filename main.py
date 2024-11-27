@@ -1,8 +1,8 @@
 """Webgate GUI Control"""
 
 __author__ = "Justin Stasiw"
-__version__ = "$Revision 1.0$"
-__date__ = "$Date: 2024/11/25"
+__version__ = "$Revision 1.1$"
+__date__ = "$Date: 2024/11/27"
 
 import sys
 
@@ -15,10 +15,12 @@ import wx.lib.mixins.listctrl as listmix
 import settings
 import button_functions
 import ipaddress
-
+from osc_functions import WebgateOSCReceiver
 
 class WebgateCamControlGUI(wx.Frame):
     # Main GUI window for the program
+
+    osc_functions = WebgateOSCReceiver()
     def __init__(self):
         super().__init__(parent=None, title="Webgate Cam Control")
         self.baud_choices = None
@@ -150,9 +152,11 @@ class WebgateCamControlGUI(wx.Frame):
         # Subscribe to info about available serial ports to populate interface dropdown
         pub.subscribe(self.add_ports_to_choice, "AvailablePorts")
         pub.subscribe(self.add_cams_to_choice, "AvailableCams")
+        pub.subscribe(self.update_cam_select_from_osc, "OSCCamSelect")
         # Query the system for possible serial ports
         serial_functions.serial_ports()
         config_functions.cam_labels()
+        self.osc_functions.start_threads()
 
         # Preset the dropdowns to the last used choices:
         if settings.last_interface in self.serial_choices:
@@ -183,8 +187,12 @@ class WebgateCamControlGUI(wx.Frame):
         ini_path = config_functions.where_to_put_user_data()
         config_functions.update_pos_in_config(cur_pos, ini_path)
         config_functions.update_size_in_config(cur_size, ini_path)
-        self.Destroy()
-        sys.exit()
+        closed_complete = self.GetTopLevelParent().osc_functions.close_servers()
+        if closed_complete:
+            try:
+                self.GetTopLevelParent().Destroy()
+            except Exception as e:
+                print(e)
 
     def add_ports_to_choice(self, choices):
         # Receiving the available ports list and adding it to the dropdown
@@ -242,6 +250,12 @@ class WebgateCamControlGUI(wx.Frame):
             button_functions.press_agc_up()
         else:
             print("Msg not recognized")
+
+    def update_cam_select_from_osc(self, new_sel_cam):
+        #
+        if new_sel_cam in self.camid_choices:
+            wx.CallAfter(self.camid_selector.SetSelection, self.camid_choices.index(settings.last_camID))
+
 
     def update_interfaces(self, event):
         # When any dropdown is changed, this def is called to deal with the change
@@ -391,18 +405,21 @@ class PrefsPanel(wx.Panel):
         if btn == "Update Preferences":
             cols = self.cam_label_list.GetColumnCount()  # Get the total number of columns
             rows = self.cam_label_list.GetItemCount()  # Get the total number of rows
-            # Create a list of the modified data
+            # Create a list of the new camera names
             new_cam_names = []
             for row in range(rows):
                 row_data = (":".join([self.cam_label_list.GetItem(row, col).GetText() for col in range(cols)]))
                 new_cam_names.append(row_data)
-            settings.camID_names = new_cam_names
             config_functions.update_cam_names_in_config(new_cam_names, config_functions.where_to_put_user_data())
             config_functions.update_ip_in_config(self.remote_ip_control.GetValue(),
                                                  self.send_port_control.GetValue(),
                                                  self.rcv_port_control.GetValue(),
                                                  config_functions.where_to_put_user_data())
+            config_functions.set_vars_from_pref(config_functions.where_to_put_user_data())
             pub.sendMessage("AvailableCams", choices=new_cam_names)
+            WebgateCamControlGUI.osc_functions.close_servers()
+            WebgateCamControlGUI.osc_functions.restart_servers()
+
             self.Parent.Destroy()
 
 
