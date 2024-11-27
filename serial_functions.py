@@ -51,6 +51,6 @@ class SerialConnection:
         # Opens a specified serial port interface
         try:
             self.ser_port = serial.Serial(interface, int(settings.last_baud), write_timeout=0)
-        except:
+        except Exception as e:
+            print(e)
             print("Serial Connection Failed")
-

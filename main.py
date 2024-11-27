@@ -8,12 +8,13 @@ import sys
 
 import constants
 import serial_functions
-import utilities
 import config_functions
 from pubsub import pub
 import wx
 import wx.lib.mixins.listctrl as listmix
 import settings
+import button_functions
+import ipaddress
 
 
 class WebgateCamControlGUI(wx.Frame):
@@ -121,11 +122,11 @@ class WebgateCamControlGUI(wx.Frame):
         self.SetAcceleratorTable(accel)
 
         # Event Bindings for Accelerator Table
-        self.Bind(wx.EVT_MENU, self.press_left, id=id_nav_left)
-        self.Bind(wx.EVT_MENU, self.press_right, id=id_nav_right)
-        self.Bind(wx.EVT_MENU, self.press_up, id=id_nav_up)
-        self.Bind(wx.EVT_MENU, self.press_down, id=id_nav_down)
-        self.Bind(wx.EVT_MENU, self.press_enter, id=id_nav_enter)
+        self.Bind(wx.EVT_MENU, button_functions.press_left, id=id_nav_left)
+        self.Bind(wx.EVT_MENU, button_functions.press_right, id=id_nav_right)
+        self.Bind(wx.EVT_MENU, button_functions.press_up, id=id_nav_up)
+        self.Bind(wx.EVT_MENU, button_functions.press_down, id=id_nav_down)
+        self.Bind(wx.EVT_MENU, button_functions.press_enter, id=id_nav_enter)
 
         # Menubar
         filemenu = wx.Menu()
@@ -209,128 +210,38 @@ class WebgateCamControlGUI(wx.Frame):
             self.baud_selector.Append(x, "bauds")
         self.baud_choices = [""] + constants.BAUD_RATES
 
-    def on_clicked(self, event):
+    @staticmethod
+    def on_clicked(event):
         # Handlers for the button presses in the UI
         btn = event.GetEventObject().GetLabel()
         if btn == "Left":
-            self.press_left()
+            button_functions.press_left()
         elif btn == "Right":
-            self.press_right()
+            button_functions.press_right()
         elif btn == "Up":
-            self.press_up()
+            button_functions.press_up()
         elif btn == "Down":
-            self.press_down()
+            button_functions.press_down()
         elif btn == "Enter":
-            self.press_enter()
+            button_functions.press_enter()
         elif btn == "B/W":
-            self.press_bw()
+            button_functions.press_bw()
         elif btn == "Auto":
-            self.press_auto()
+            button_functions.press_auto()
         elif btn == "Color":
-            self.press_color()
+            button_functions.press_color()
         elif btn == "Brightness -":
-            self.press_brightness_down()
+            button_functions.press_brightness_down()
         elif btn == "Brightness +":
-            self.press_brightness_up()
+            button_functions.press_brightness_up()
         elif btn == "AGC -":
-            self.press_agc_down()
+            button_functions.press_agc_down()
         elif btn == "AGC Middle":
-            self.press_agc_mid()
+            button_functions.press_agc_mid()
         elif btn == "AGC +":
-            self.press_agc_up()
+            button_functions.press_agc_up()
         else:
             print("Msg not recognized")
-
-    @staticmethod
-    def press_left(*args):
-        key_id = "00"
-        button_id = "04"
-        preset_id = "00"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_right(*args):
-        key_id = "00"
-        button_id = "02"
-        preset_id = "00"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_up(*args):
-        key_id = "00"
-        button_id = "08"
-        preset_id = "00"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_down(*args):
-        key_id = "00"
-        button_id = "10"
-        preset_id = "00"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_enter(*args):
-        key_id = "00"
-        button_id = "1e"
-        preset_id = "00"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_bw(*args):
-        key_id = "00"
-        button_id = "07"
-        preset_id = "52"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_auto(*args):
-        key_id = "00"
-        button_id = "07"
-        preset_id = "50"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_color(*args):
-        key_id = "00"
-        button_id = "07"
-        preset_id = "51"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_brightness_down(*args):
-        key_id = "00"
-        button_id = "07"
-        preset_id = "53"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_brightness_up(*args):
-        key_id = "00"
-        button_id = "07"
-        preset_id = "54"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_agc_down(*args):
-        key_id = "00"
-        button_id = "07"
-        preset_id = "65"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_agc_up(*args):
-        key_id = "00"
-        button_id = "07"
-        preset_id = "66"
-        utilities.msg_builder(key_id, button_id, preset_id)
-
-    @staticmethod
-    def press_agc_mid(*args):
-        key_id = "00"
-        button_id = "07"
-        preset_id = "64"
-        utilities.msg_builder(key_id, button_id, preset_id)
 
     def update_interfaces(self, event):
         # When any dropdown is changed, this def is called to deal with the change
@@ -388,8 +299,10 @@ class PrefsWindow(wx.Frame):
 
 class PrefsPanel(wx.Panel):
     def __init__(self, parent):
+        self.ip_inspected = False
         wx.Panel.__init__(self, parent)
         panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        # UI for Camera Labeling
         cam_label_text = wx.StaticText(self, label="Cam Labels", style=wx.ALIGN_CENTER)
         panel_sizer.Add(cam_label_text, 0, wx.ALL | wx.EXPAND, 5)
         self.cam_label_list = EditableListCtrl(self, size=(-1, 150), style=wx.LC_REPORT | wx.BORDER_SUNKEN)
@@ -397,13 +310,43 @@ class PrefsPanel(wx.Panel):
         self.cam_label_list.InsertColumn(1, "Name", width=175, format=wx.LIST_FORMAT_CENTRE)
         panel_sizer.Add(self.cam_label_list, 1, wx.ALL | wx.EXPAND, 5)
         panel_sizer.AddSpacer(15)
-        update_names_button = wx.Button(self, label="Update Names")
-        panel_sizer.Add(update_names_button, 0, wx.ALL | wx.EXPAND, 5)
+        # UI for Remote OSC IP
+        remote_ip_text = wx.StaticText(self, label="Remote IP", style=wx.ALIGN_CENTER)
+        panel_sizer.Add(remote_ip_text, 0, wx.ALL | wx.EXPAND, 5)
+        # Remote IP Input
+        self.remote_ip_control = wx.TextCtrl(self, style=wx.TE_CENTER)
+        self.remote_ip_control.SetMaxLength(15)
+        self.remote_ip_control.SetValue(settings.remote_ip)
+        panel_sizer.Add(self.remote_ip_control, 0, wx.ALL | wx.EXPAND, 5)
+        panel_sizer.Add(0, 10)
+
+        # Ports Preference Selectors
+        ports_grid = wx.GridSizer(2, 2, -1, 10)
+        send_port_text = wx.StaticText(self, label="Send to Device", style=wx.ALIGN_CENTER)
+        ports_grid.Add(send_port_text, 0, wx.ALL | wx.EXPAND, 5)
+        rcv_port_text = wx.StaticText(self, label="Receive from Device", style=wx.ALIGN_CENTER)
+        ports_grid.Add(rcv_port_text, 0, wx.ALL | wx.EXPAND, 5)
+        self.send_port_control = wx.TextCtrl(self, style=wx.TE_CENTER)
+        self.send_port_control.SetMaxLength(5)
+        self.send_port_control.SetValue(str(settings.send_port))
+        ports_grid.Add(self.send_port_control, 0, wx.ALL | wx.EXPAND, -1)
+        self.rcv_port_control = wx.TextCtrl(self, style=wx.TE_CENTER)
+        self.rcv_port_control.SetMaxLength(5)
+        self.rcv_port_control.SetValue(str(settings.receive_port))
+        ports_grid.Add(self.rcv_port_control, 0, wx.ALL | wx.EXPAND, -1)
+        panel_sizer.Add(ports_grid, 0, wx.ALL | wx.EXPAND, 5)
+        # Update Preferences button
+        update_prefs_button = wx.Button(self, label="Update Preferences")
+        panel_sizer.Add(update_prefs_button, 0, wx.ALL | wx.EXPAND, 5)
+
         self.name_index = 0
         self.populate_camid_prefs_list()
         self.SetSizer(panel_sizer)
         self.Bind(wx.EVT_LIST_END_LABEL_EDIT, self.on_cam_names_update)
-        self.Bind(wx.EVT_BUTTON, self.push_label_update)
+        self.Bind(wx.EVT_BUTTON, self.push_prefs_update)
+        self.remote_ip_control.Bind(wx.EVT_TEXT, self.changed_remote_ip)
+        self.remote_ip_control.Bind(wx.EVT_KILL_FOCUS, self.check_ip)
+
         self.Fit()
         self.Show()
 
@@ -421,9 +364,31 @@ class PrefsPanel(wx.Panel):
         # Set the new data in the listctrl
         self.cam_label_list.SetItem(row_id, col_id, new_data)
 
-    def push_label_update(self, event):
+    def changed_remote_ip(self, e):
+        # Flag to know if the console IP has been modified in the prefs window
+        self.ip_inspected = False
+
+    def check_ip(self, e):
+        # Validates input into the console IP address field
+        # Use the ip_address function from the ipaddress module to check if the input is a valid IP address
+        ip = self.remote_ip_control.GetValue()
+
+        if not self.ip_inspected:
+            self.ip_inspected = True
+            try:
+                ipaddress.ip_address(ip)
+            except ValueError:
+                # If the input is not a valid IP address, catch the exception and show a dialog
+                dlg = wx.MessageDialog(self, "This is not a valid IP address for the remote. Please try again",
+                                       "Webgate Cam Control", wx.OK)
+                dlg.ShowModal()  # Shows it
+                dlg.Destroy()  # Destroy pop-up when finished.
+                # Put the focus back on the bad field
+                wx.CallAfter(self.remote_ip_control.SetFocus)
+
+    def push_prefs_update(self, event):
         btn = event.GetEventObject().GetLabel()
-        if btn == "Update Names":
+        if btn == "Update Preferences":
             cols = self.cam_label_list.GetColumnCount()  # Get the total number of columns
             rows = self.cam_label_list.GetItemCount()  # Get the total number of rows
             # Create a list of the modified data
@@ -433,7 +398,12 @@ class PrefsPanel(wx.Panel):
                 new_cam_names.append(row_data)
             settings.camID_names = new_cam_names
             config_functions.update_cam_names_in_config(new_cam_names, config_functions.where_to_put_user_data())
+            config_functions.update_ip_in_config(self.remote_ip_control.GetValue(),
+                                                 self.send_port_control.GetValue(),
+                                                 self.rcv_port_control.GetValue(),
+                                                 config_functions.where_to_put_user_data())
             pub.sendMessage("AvailableCams", choices=new_cam_names)
+            self.Parent.Destroy()
 
 
 if __name__ == "__main__":

@@ -46,6 +46,9 @@ def build_initial_ini(ini_prefs_path):
     config["main"]["window_pos_x"] = "400"
     config["main"]["window_pos_y"] = "222"
     config["main"]["cam_names"] = ",".join(constants.DEFAULT_CAM_LABELS)
+    config["main"]["remote_ip"] = "192.168.10.100"
+    config["main"]["send_port"] = "9999"
+    config["main"]["receive_port"] = "9998"
 
     with open(ini_prefs_path, "w") as configfile:
         config.write(configfile)
@@ -62,6 +65,9 @@ def set_vars_from_pref(config_file_loc):
     settings.last_baud = config["main"]["last_baud"]
     settings.last_camID = config["main"]["last_cam"]
     settings.camID_names = config["main"]["cam_names"].split(",")
+    settings.remote_ip = config["main"]["remote_ip"]
+    settings.send_port = int(config["main"]["send_port"])
+    settings.receive_port = int(config["main"]["receive_port"])
 
 
 def update_pos_in_config(win_pos_tuple, ini_prefs_path):
@@ -123,6 +129,17 @@ def update_cam_names_in_config(cam_names, ini_prefs_path):
     updater.read(ini_prefs_path)
     try:
         updater["main"]["cam_names"] = ",".join(cam_names)
+    except Exception as e:
+        print(e)
+    updater.update_file()
+
+def update_ip_in_config(remote_ip, send_port, receive_port, ini_prefs_path):
+    updater = ConfigUpdater()
+    updater.read(ini_prefs_path)
+    try:
+        updater["main"]["remote_ip"] = remote_ip
+        updater["main"]["send_port"] = send_port
+        updater["main"]["receive_port"] = receive_port
     except Exception as e:
         print(e)
     updater.update_file()

@@ -4,3 +4,6 @@ last_interface = ""
 last_baud = "9600"
 last_camID = "1:"
 camID_names = []
+remote_ip = "192.168.10.100"
+send_port = "9999"
+receive_port = "9998"
