@@ -40,7 +40,7 @@ class WebgateOSCReceiver:
             print("Unable to make OSC connection")
 
     def receive_webgate_osc(self):
-        # Receives and distributes OSC from Digico, based on matching OSC values
+        # Receives and distributes OSC from Remote webgate controller, based on matching OSC values
         self.webgate_dispatcher.map("/ID", self.update_selected_cam)
         self.webgate_dispatcher.map("/button", self.osc_button_handler)
 
