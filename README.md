@@ -40,6 +40,9 @@ I've included a TouchOSC layout in the repository as an example.
 
 If this software has been useful to you, please consider donating via Github Sponsors below:
 
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/jms5194)
+
+
 
 
 
