@@ -18,10 +18,28 @@ The UI is generally self-explanatory- you select an interface (on MacOS this wil
 
 Then you select a baud rate, and a camera ID. Pressing enter will bring up the OSD on the selected camera's output. 
 
-You can name your cameras via the preferences window:
+There is a preferences window: 
 
-<img width="351" alt="Preferences UI Window" src="https://github.com/user-attachments/assets/13839ef6-49f5-4fbe-ba62-32886d304b6e">
+<img width="408" alt="Preferences Window" src="https://github.com/user-attachments/assets/4f471807-43a5-420f-8416-ad815ebfee38">
 
-And that's about it. 
+In that window you can label the cameras, and also setup an OSC link. You can remotely control the software from an external OSC device. 
+
+Setup an IP address and ports for a remote device and the software will make a connection when you update preferences. 
+
+Supported messages right now are:
+
+/ID x (where x is an interger of the camera ID)
+
+/button LEFT
+/button RIGHT
+/button UP
+/button DOWN
+/button ENTER
+
+I've included a TouchOSC layout in the repository as an example. 
+
+If this software has been useful to you, please consider donating via Github Sponsors below:
+
+
 
 
