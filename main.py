@@ -110,27 +110,27 @@ class WebgateCamControlGUI(wx.Frame):
         panel.SetSizer(panel_sizer)
 
         # Accelerator entries to allow for Menu access from keystrokes
-        id_nav_left = wx.ID_ANY
-        id_nav_right = wx.ID_ANY
-        id_nav_up = wx.ID_ANY
-        id_nav_down = wx.ID_ANY
-        id_nav_enter = wx.ID_ANY
+        id_nav_left = wx.NewIdRef()
+        id_nav_right = wx.NewIdRef()
+        id_nav_up = wx.NewIdRef()
+        id_nav_down = wx.NewIdRef()
+        id_nav_enter = wx.NewIdRef()
 
-        entries = [wx.AcceleratorEntry() for i in range(5)]
-        entries[0].Set(wx.ACCEL_NORMAL, wx.WXK_LEFT, id_nav_left)
-        entries[1].Set(wx.ACCEL_NORMAL, wx.WXK_RIGHT, id_nav_right)
-        entries[2].Set(wx.ACCEL_NORMAL, wx.WXK_UP, id_nav_up)
-        entries[3].Set(wx.ACCEL_NORMAL, wx.WXK_DOWN, id_nav_down)
-        entries[4].Set(wx.ACCEL_NORMAL, wx.WXK_RETURN, id_nav_enter)
+        entries = [wx.AcceleratorEntry() for _ in range(5)]
+        entries[0].Set(wx.ACCEL_NORMAL, wx.WXK_LEFT, id_nav_left.GetId())
+        entries[1].Set(wx.ACCEL_NORMAL, wx.WXK_RIGHT, id_nav_right.GetId())
+        entries[2].Set(wx.ACCEL_NORMAL, wx.WXK_UP, id_nav_up.GetId())
+        entries[3].Set(wx.ACCEL_NORMAL, wx.WXK_DOWN, id_nav_down.GetId())
+        entries[4].Set(wx.ACCEL_NORMAL, wx.WXK_RETURN, id_nav_enter.GetId())
         accel = wx.AcceleratorTable(entries)
         self.SetAcceleratorTable(accel)
 
         # Event Bindings for Accelerator Table
-        self.Bind(wx.EVT_MENU, button_functions.press_left, id=id_nav_left)
-        self.Bind(wx.EVT_MENU, button_functions.press_right, id=id_nav_right)
-        self.Bind(wx.EVT_MENU, button_functions.press_up, id=id_nav_up)
-        self.Bind(wx.EVT_MENU, button_functions.press_down, id=id_nav_down)
-        self.Bind(wx.EVT_MENU, button_functions.press_enter, id=id_nav_enter)
+        self.Bind(wx.EVT_MENU, button_functions.press_left, id=id_nav_left.GetId())
+        self.Bind(wx.EVT_MENU, button_functions.press_right, id=id_nav_right.GetId())
+        self.Bind(wx.EVT_MENU, button_functions.press_up, id=id_nav_up.GetId())
+        self.Bind(wx.EVT_MENU, button_functions.press_down, id=id_nav_down.GetId())
+        self.Bind(wx.EVT_MENU, button_functions.press_enter, id=id_nav_enter.GetId())
 
         # Menubar
         filemenu = wx.Menu()
