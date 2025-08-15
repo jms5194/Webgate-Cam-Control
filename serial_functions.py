@@ -1,5 +1,6 @@
 import serial
 import serial.tools.list_ports
+from serial import SerialTimeoutException
 from pubsub import pub
 import settings
 
@@ -31,9 +32,11 @@ class SerialConnection:
                     if self.ser_port.isOpen():
                         try:
                             self.ser_port.write(bytearray.fromhex(msg))
-                            self.ser_port.close()
                         except SerialTimeoutException as e:
                             print(e)
+                        except Exception as e:
+                            print(e)
+
         else:
             settings.last_interface = interface
             self.ser_port.close()
@@ -42,14 +45,26 @@ class SerialConnection:
                 if self.ser_port.isOpen():
                     try:
                         self.ser_port.write(bytearray.fromhex(msg))
-                        self.ser_port.close()
                     except SerialTimeoutException as e:
+                        print(e)
+                    except Exception as e:
                         print(e)
 
     def open_serial(self, interface):
         # Opens a specified serial port interface
         try:
-            self.ser_port = serial.Serial(interface, int(settings.last_baud), write_timeout=0)
+            self.ser_port = serial.Serial(interface, int(settings.last_baud), write_timeout=0.5)
         except Exception as e:
             print(e)
             print("Serial Connection Failed")
+
+    def close_serial(self):
+        try:
+            if self.ser_port is not None:
+                if self.ser_port.isOpen():
+                    self.ser_port.close()
+        except Exception as e:
+            print(e)
+
+
+persistent_serial_connection = SerialConnection()

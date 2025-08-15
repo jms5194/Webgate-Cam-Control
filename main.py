@@ -16,6 +16,8 @@ import settings
 import button_functions
 import ipaddress
 from osc_functions import WebgateOSCReceiver
+from serial_functions import persistent_serial_connection
+
 
 class WebgateCamControlGUI(wx.Frame):
     # Main GUI window for the program
@@ -187,6 +189,7 @@ class WebgateCamControlGUI(wx.Frame):
         ini_path = config_functions.where_to_put_user_data()
         config_functions.update_pos_in_config(cur_pos, ini_path)
         config_functions.update_size_in_config(cur_size, ini_path)
+        serial_functions.persistent_serial_connection.close_serial()
         closed_complete = self.GetTopLevelParent().osc_functions.close_servers()
         if closed_complete:
             try:
