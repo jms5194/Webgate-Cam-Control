@@ -149,7 +149,6 @@ jobs:
         run: |
           chmod a+x "dist/Webgate Camera Control.app"
           brew update
-          brew upgrade
           brew install create-dmg
           create-dmg \
           --volname "Webgate Camera Control Installer" \
